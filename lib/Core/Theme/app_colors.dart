@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 
 class AppColors {
   // MARK - Main Colors
-  static const Color primary = Color(0xFF1B67F3);
+  static const Color primary = Color(0xFFE50914);
   static const Color primaryDark = Color(0xFF6F060B);
   static const Color secondary = Color(0xFF5949E6);
 
@@ -30,9 +30,9 @@ class AppColors {
 
   // MARK - Gradients
   static const LinearGradient bgGradient = LinearGradient(
-    colors: [Color(0xFF3F0306), Color(0xFF090909)],
-    begin: Alignment.topLeft,
-    end: Alignment.bottomRight,
+    colors: [Color(0xFF3F0306), Color(0xFF090909), Color(0xFF090909)],
+    begin: Alignment.topCenter,
+    end: Alignment.bottomCenter,
   );
 
   static const LinearGradient popularCard = LinearGradient(
@@ -47,9 +47,9 @@ class AppColors {
     end: Alignment.bottomCenter,
   );
 
-  static const LinearGradient activeNav = LinearGradient(
-    colors: [Color(0xFF6F060B), Color(0xFFB82F3C)],
-    begin: Alignment.topLeft,
-    end: Alignment.bottomRight,
+  static const RadialGradient activeNav = RadialGradient(
+    colors: [Color(0xFFE50914), Color(0xFF7F050B)],
+    center: Alignment.topCenter,
+    radius: 2
   );
 }

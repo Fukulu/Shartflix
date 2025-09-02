@@ -1,7 +1,35 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:nodelabscase/Components/CustomButtons/custom_checkBox_button.dart';
+import 'package:nodelabscase/Components/CustomButtons/like_button.dart';
+import 'package:nodelabscase/Components/CustomButtons/primary_large_button.dart';
+import 'package:nodelabscase/Components/CustomButtons/social_media_button.dart';
+import 'package:nodelabscase/Components/CustomButtons/x_mark_button.dart';
+import 'package:nodelabscase/Components/CustomTabBar/custom_tab_bar.dart';
+import 'package:nodelabscase/Components/CustomTextField/custom_email_field.dart';
+import 'package:nodelabscase/Components/CustomTextField/custom_password_field.dart';
+import 'package:nodelabscase/Core/Theme/app_colors.dart';
+import 'package:nodelabscase/Core/Theme/app_icons.dart';
+import 'package:nodelabscase/Core/Theme/app_theme.dart';
+import 'package:provider/provider.dart';
+
+import 'Components/CustomButtons/back_chevron_button.dart';
+import 'Components/CustomButtons/secondary_large_button.dart';
+import 'View/Splash/splash_screen_page.dart';
+import 'ViewModel/auth_view_model.dart';
 
 void main() {
-  runApp(const MyApp());
+
+  runApp(
+      MultiProvider(
+          providers: [
+            ChangeNotifierProvider<AuthViewModel>(
+              create: (context) => AuthViewModel()
+            )
+          ],
+      child: MyApp()
+      )
+  );
 }
 
 class MyApp extends StatelessWidget {
@@ -11,60 +39,9 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Flutter Demo',
-      theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
-        useMaterial3: true,
-      ),
-      home: const MyHomePage(title: 'Flutter Demo Home Page'),
-    );
-  }
-}
-
-class MyHomePage extends StatefulWidget {
-  const MyHomePage({super.key, required this.title});
-
-  final String title;
-
-  @override
-  State<MyHomePage> createState() => _MyHomePageState();
-}
-
-class _MyHomePageState extends State<MyHomePage> {
-  int _counter = 0;
-
-  void _incrementCounter() {
-    setState(() {
-      _counter++;
-    });
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-        title: Text(widget.title),
-      ),
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            const Text(
-              'You have pushed the button this many times:',
-            ),
-            Text(
-              '$_counter',
-              style: Theme.of(context).textTheme.headlineMedium,
-            ),
-          ],
-        ),
-      ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: _incrementCounter,
-        tooltip: 'Increment',
-        child: const Icon(Icons.add),
-      ),
+      title: 'Shartflix App',
+      theme: AppTheme.theme,
+      home: const SplashScreenPage(),
     );
   }
 }
