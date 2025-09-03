@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:nodelabscase/Components/CustomViews/custom_background_view.dart';
 import 'package:nodelabscase/Core/Theme/app_icons.dart';
+import 'package:nodelabscase/View/Entrance/login_page.dart';
 import 'package:provider/provider.dart';
 
 import '../../Core/Theme/app_typography.dart';
@@ -28,37 +29,24 @@ class _SplashScreenPageState extends State<SplashScreenPage> {
   Future<void> _navigateToHome() async {
     final authViewModel = Provider.of<AuthViewModel>(context, listen: false);
 
-    try {
-      await authViewModel.fetchUserProfile();
-      await Future.delayed(const Duration(seconds: 3));
+    await authViewModel.init();
+    await Future.delayed(const Duration(seconds: 2));
 
-      if (!mounted) return;
+    if (!mounted) return;
 
-      if (authViewModel.currentUser != null) {
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(builder: (context) => Center()), // HOME
-        );
-      } else {
-        if (mounted) {
-          Navigator.pushReplacement(
-            context,
-            MaterialPageRoute(builder: (context) => Center()), // LOGIN
-          );
-        }
-      }
-    } catch (e) {
-      if (kDebugMode) {
-        print("DEBUG -> Something wrong in _navigateHome func: ${e.toString()}");
-      }
-      if (mounted) {
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(builder: (context) => Center()), //LOGIN
-        );
-      }
+    if (authViewModel.token != null && authViewModel.currentUser != null) {
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => const Center()),
+      );
+    } else {
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => const LoginPage()),
+      );
     }
   }
+
 
   @override
   Widget build(BuildContext context) {

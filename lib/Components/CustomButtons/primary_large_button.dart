@@ -30,15 +30,7 @@ class PrimaryLargeButton extends StatelessWidget {
       width: width,
       height: height,
       child: ElevatedButton(
-        onPressed: (){
-          if (isActive) {
-            onPressed();
-          } else {
-            if (kDebugMode) {
-              print("DEBUG -> Button is disabled!");
-            }
-          }
-        },
+        onPressed: onPressed,
         style: ElevatedButton.styleFrom(
           backgroundColor: isActive ? AppColors.primary : AppColors.primaryDark,
           shape: RoundedRectangleBorder(
