@@ -53,7 +53,8 @@ class _CustomTabBarState extends State<CustomTabBar> {
         final isActive = index == selectedIndex;
         final tab = _tabs[index];
 
-        return Expanded(
+        return SizedBox(
+          width: 200,
           child: GestureDetector(
             onTap: () => onTabTap(index),
             child: AnimatedContainer(

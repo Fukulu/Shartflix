@@ -4,6 +4,7 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:nodelabscase/Components/CustomViews/custom_background_view.dart';
 import 'package:nodelabscase/Core/Theme/app_icons.dart';
 import 'package:nodelabscase/View/Entrance/login_page.dart';
+import 'package:nodelabscase/View/Home/home_page.dart';
 import 'package:provider/provider.dart';
 
 import '../../Core/Theme/app_typography.dart';
@@ -37,7 +38,7 @@ class _SplashScreenPageState extends State<SplashScreenPage> {
     if (authViewModel.token != null && authViewModel.currentUser != null) {
       Navigator.pushReplacement(
         context,
-        MaterialPageRoute(builder: (context) => const Center()),
+        MaterialPageRoute(builder: (context) => const HomePage()),
       );
     } else {
       Navigator.pushReplacement(
