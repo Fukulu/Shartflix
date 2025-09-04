@@ -1,9 +1,7 @@
-import 'dart:ui';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:nodelabscase/Components/CustomButtons/like_button.dart';
-import 'package:nodelabscase/Components/CustomTabBar/custom_tab_bar.dart';
 import 'package:nodelabscase/Components/CustomViews/blurred_background_view.dart';
 import 'package:nodelabscase/Components/CustomViews/circular_indicator_view.dart';
 import 'package:nodelabscase/Components/CustomViews/expandable_text_view.dart';
@@ -20,29 +18,16 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  int _selectedIndex = 0;
-  final PageController _pageController = PageController();
 
-  void _onTabChanged(int index) {
-    setState(() {
-      _selectedIndex = index;
-    });
-  }
+  final PageController _pageController = PageController();
 
   @override
   void initState() {
     super.initState();
-
     final movieVM = Provider.of<MovieViewModel>(context, listen: false);
-    Future.microtask(() => movieVM.fetchMovies(page: 1));
-
-    _pageController.addListener(() {
-      final movieVM = Provider.of<MovieViewModel>(context, listen: false);
-      final currentIndex = _pageController.page?.round() ?? 0;
-      if ((currentIndex + 1) % 5 == 0) {
-        movieVM.currentPage += 1;
-        movieVM.fetchMovies(page: movieVM.currentPage);
-      }
+    Future.microtask(() async {
+      await movieVM.fetchMovies(page: 1);
+      await movieVM.fetchFavorites();
     });
   }
 
@@ -64,7 +49,7 @@ class _HomePageState extends State<HomePage> {
           }
 
           if (movieVM.movies.isEmpty) {
-            return const Center(child: Text("Film bulunamadı"));
+            return const Center(child: Text("No movies available"));
           }
 
           return Stack(
@@ -78,6 +63,14 @@ class _HomePageState extends State<HomePage> {
                   final posterUrl = movie.posterUrl.startsWith("http://")
                       ? movie.posterUrl.replaceFirst("http://", "https://")
                       : movie.posterUrl;
+
+                  if ((index + 1) == movieVM.movies.length &&
+                      movieVM.movies.length % 5 == 0 &&
+                      !movieVM.isLoading) {
+                    final nextPage = movieVM.currentPage + 1;
+                    debugPrint("DEBUG -> Fetching Page $nextPage...");
+                    movieVM.fetchMovies(page: nextPage);
+                  }
 
                   return Stack(
                     children: [
@@ -94,10 +87,9 @@ class _HomePageState extends State<HomePage> {
                               mainAxisAlignment: MainAxisAlignment.end,
                               children: [
                                 LikeButton(
+                                  isSelected: movieVM.favoriteMovieIds.contains(movie.id),
                                   onPressed: () {
-                                    if (kDebugMode) {
-                                      print("DEBUG -> Like ${movie.title}");
-                                    }
+                                    movieVM.toggleFavorite(movie.id);
                                   },
                                 ),
                               ],
@@ -112,13 +104,11 @@ class _HomePageState extends State<HomePage> {
                                 const SizedBox(width: 10),
                                 Expanded(
                                   child: Column(
-                                    crossAxisAlignment:
-                                    CrossAxisAlignment.start,
+                                    crossAxisAlignment: CrossAxisAlignment.start,
                                     children: [
                                       Text(
                                         movie.title,
-                                        style: AppTypography.h3
-                                            .copyWith(color: Colors.white),
+                                        style: AppTypography.h3.copyWith(color: Colors.white),
                                       ),
                                       const SizedBox(height: 8),
                                       ExpandableText(
@@ -131,28 +121,12 @@ class _HomePageState extends State<HomePage> {
                               ],
                             ),
                             const SizedBox(height: 100),
-
                           ],
                         ),
                       ),
-
                     ],
                   );
                 },
-              ),
-
-              // TAG - CUSTOM TAB BAR
-              Padding(
-                padding: const EdgeInsets.symmetric(vertical: 20.0),
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.end,
-                  children: [
-                    CustomTabBar(
-                      initialIndex: _selectedIndex,
-                      onTabChanged: _onTabChanged,
-                    ),
-                  ],
-                ),
               ),
 
               if (movieVM.isLoading)
@@ -164,6 +138,10 @@ class _HomePageState extends State<HomePage> {
                     child: CircularProgressIndicator(color: AppColors.primary),
                   ),
                 ),
+
+              if (movieVM.isFavoriteLoading)
+                const CircularIndicatorView()
+
             ],
           );
         },

@@ -8,7 +8,7 @@ class CustomNameField extends StatefulWidget {
 
   const CustomNameField({
     super.key,
-    this.hintText = "Ad Soyad",
+    this.hintText = "Name Surname",
     required this.controller,
   });
 
@@ -23,9 +23,9 @@ class _CustomNameFieldState extends State<CustomNameField> {
   void _validateName(String value) {
     setState(() {
       if (value.isEmpty) {
-        errorText = null; // boşken hata gösterme
+        errorText = null;
       } else if (value.trim().length < 2) {
-        errorText = "İsim en az 2 karakter olmalıdır";
+        errorText = "Name must be at least 2 characters long";
       } else {
         errorText = null;
       }

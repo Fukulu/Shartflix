@@ -6,13 +6,15 @@ import 'package:nodelabscase/Core/Theme/app_icons.dart';
 class LikeButton extends StatefulWidget {
   final double width;
   final double height;
-  final VoidCallback onPressed; // dışarıdan fonksiyon
+  final bool isSelected;
+  final VoidCallback onPressed;
 
   const LikeButton({
     super.key,
     required this.onPressed,
     this.width = 52,
     this.height = 72,
+    this.isSelected = false
   });
 
   @override
@@ -22,10 +24,23 @@ class LikeButton extends StatefulWidget {
 class _LikeButtonState extends State<LikeButton> {
   bool isLiked = false;
 
+  @override
+  void initState() {
+    super.initState();
+    isLiked = widget.isSelected;
+  }
+
+  @override
+  void didUpdateWidget(covariant LikeButton oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.isSelected != widget.isSelected) {
+      setState(() {
+        isLiked = widget.isSelected;
+      });
+    }
+  }
+
   void toggleLike() {
-    setState(() {
-      isLiked = !isLiked;
-    });
     widget.onPressed();
   }
 

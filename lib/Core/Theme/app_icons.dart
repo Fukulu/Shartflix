@@ -17,6 +17,7 @@ class AppIcons {
   static const String plus = "assets/icons/Plus.svg";
   static const String profile = "assets/icons/Profile.svg";
   static const String profileFill = "assets/icons/Profile-fill.svg";
+  static const String profilePhoto = "assets/icons/profilePhoto.svg";
   static const String see = "assets/icons/See.svg";
   static const String user = "assets/icons/User.svg";
   static const String x = "assets/icons/X.svg";

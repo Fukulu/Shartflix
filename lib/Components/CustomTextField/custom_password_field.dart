@@ -24,9 +24,9 @@ class _CustomPasswordFieldState extends State<CustomPasswordField> {
   void _validatePassword(String value) {
     setState(() {
       if (value.isEmpty) {
-        errorText = null; // boşken hata gösterme
+        errorText = null;
       } else if (value.length < 6) {
-        errorText = "Şifre en az 6 karakter olmalıdır";
+        errorText = "Password must be at least 6 characters.";
       } else {
         errorText = null;
       }

@@ -1,12 +1,9 @@
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:nodelabscase/Components/CustomViews/custom_background_view.dart';
-import 'package:nodelabscase/Core/Theme/app_icons.dart';
 import 'package:nodelabscase/View/Entrance/login_page.dart';
-import 'package:nodelabscase/View/Home/home_page.dart';
+import 'package:nodelabscase/View/Home/tab_controller_page.dart';
 import 'package:provider/provider.dart';
-
 import '../../Core/Theme/app_typography.dart';
 import '../../ViewModel/auth_view_model.dart';
 
@@ -38,7 +35,7 @@ class _SplashScreenPageState extends State<SplashScreenPage> {
     if (authViewModel.token != null && authViewModel.currentUser != null) {
       Navigator.pushReplacement(
         context,
-        MaterialPageRoute(builder: (context) => const HomePage()),
+        MaterialPageRoute(builder: (context) => const TabControllerPage()),
       );
     } else {
       Navigator.pushReplacement(

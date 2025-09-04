@@ -21,7 +21,7 @@ class _CustomTabBarState extends State<CustomTabBar> {
 
   final List<Map<String, dynamic>> _tabs = const [
     {
-      "label": "HomePage",
+      "label": "Home Page",
       "activeIcon": AppIcons.homeFill,
       "inactiveIcon": AppIcons.home,
     },

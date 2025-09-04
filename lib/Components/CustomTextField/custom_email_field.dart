@@ -8,7 +8,7 @@ class CustomEmailField extends StatefulWidget {
 
   const CustomEmailField({
     super.key,
-    this.hintText = "E-Posta",
+    this.hintText = "E-Mail",
     required this.controller,
   });
 
@@ -20,7 +20,6 @@ class _CustomEmailFieldState extends State<CustomEmailField> {
   bool isFocused = false;
   String? errorText;
 
-  /// Basit e-posta regex kontrolü
   bool _isValidEmail(String value) {
     final regex = RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$');
     return regex.hasMatch(value);
@@ -29,9 +28,9 @@ class _CustomEmailFieldState extends State<CustomEmailField> {
   void _validateEmail(String value) {
     setState(() {
       if (value.isEmpty) {
-        errorText = null; // boşsa hata gösterme
+        errorText = null;
       } else if (!_isValidEmail(value)) {
-        errorText = "Geçerli bir e-posta adresi giriniz";
+        errorText = "Please enter a valid email address";
       } else {
         errorText = null;
       }
@@ -50,7 +49,6 @@ class _CustomEmailFieldState extends State<CustomEmailField> {
                 isFocused = focus;
               });
               if (!focus) {
-                // focus kaybolunca email'i kontrol et
                 _validateEmail(widget.controller.text);
               }
             },

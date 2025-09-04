@@ -35,7 +35,7 @@ class _ExpandableTextState extends State<ExpandableText> {
             TextSpan(text: widget.text),
             const TextSpan(text: " "),
             TextSpan(
-              text: "Daha Az Göster",
+              text: "Show Less",
               style: linkStyle,
               recognizer: TapGestureRecognizer()
                 ..onTap = () => setState(() => _isExpanded = false),
@@ -70,7 +70,7 @@ class _ExpandableTextState extends State<ExpandableText> {
                 TextSpan(text: cutText.trimRight()),
                 const TextSpan(text: "… "),
                 TextSpan(
-                  text: "Devamını Göster",
+                  text: "Show More",
                   style: linkStyle,
                   recognizer: TapGestureRecognizer()
                     ..onTap = () => setState(() => _isExpanded = true),

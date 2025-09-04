@@ -28,8 +28,10 @@ class AuthViewModel extends ChangeNotifier {
     }
   }
 
-  // TAG - FETCH USER PROFILE (token ile)
+  // TAG - FETCH USER PROFILE
   Future<void> fetchUserProfile() async {
+    final prefs = await SharedPreferences.getInstance();
+    token = prefs.getString("auth_token");
     if (token == null) {
       if (kDebugMode) print("ERROR -> No token available!");
       return;
@@ -46,16 +48,21 @@ class AuthViewModel extends ChangeNotifier {
       );
 
       if (response.statusCode == 200) {
-        final data = jsonDecode(response.body);
-        currentUser = UserModel.fromJson(data);
-        notifyListeners();
+        final body = jsonDecode(response.body);
 
-        if (kDebugMode) {
-          print("DEBUG -> User information successfully fetched: ${currentUser?.name}");
+        final data = body["data"]; // ✅ sadece "data" kısmını al
+        if (data != null) {
+          currentUser = UserModel.fromJson(data);
+          notifyListeners();
+
+          if (kDebugMode) {
+            print("DEBUG -> User info fetched: ${currentUser?.name}");
+          }
         }
       } else {
         if (kDebugMode) {
           print("ERROR -> Profile fetch failed. Status: ${response.statusCode}");
+          print("DEBUG -> Body: ${response.body}");
         }
       }
     } catch (e) {
@@ -78,18 +85,26 @@ class AuthViewModel extends ChangeNotifier {
       );
 
       if (response.statusCode == 200) {
-        final data = jsonDecode(response.body);
+        final decoded = jsonDecode(response.body);
+
+        final data = decoded["data"];
+        if (data == null) {
+          debugPrint("ERROR -> Login response missing data");
+          return;
+        }
 
         token = data["token"];
-        currentUser = UserModel.fromJson(data["user"]);
 
-        // Token sakla
         final prefs = await SharedPreferences.getInstance();
         await prefs.setString("auth_token", token!);
+
+        await fetchUserProfile();
 
         if (kDebugMode) {
           print("DEBUG -> Login successful, token saved: $token");
           print("DEBUG -> Current User: ${currentUser?.name}");
+          print("DEBUG -> Current User Email: ${currentUser?.email}");
+          print("DEBUG -> Current User Photo URL: ${currentUser?.id}");
         }
 
         notifyListeners();
@@ -154,44 +169,43 @@ class AuthViewModel extends ChangeNotifier {
     }
   }
 
-
   // TAG - UPLOAD PHOTO
   Future<void> uploadPhoto(File imageFile) async {
+    final prefs = await SharedPreferences.getInstance();
+    token = prefs.getString("auth_token");
     if (token == null) return;
 
     try {
-      final req = http.MultipartRequest(
-        'POST',
-        Uri.parse('$_baseUrl/user/upload_photo'),
+      final request = http.MultipartRequest(
+        "POST",
+        Uri.parse("$_baseUrl/user/upload_photo"),
       );
-      req.headers['Authorization'] = 'Bearer $token';
-      req.files.add(await http.MultipartFile.fromPath('file', imageFile.path));
+      request.headers["Authorization"] = "Bearer $token";
+      request.files.add(await http.MultipartFile.fromPath("file", imageFile.path));
 
-      final streamed = await req.send();
-      final res = await http.Response.fromStream(streamed);
+      final streamedResponse = await request.send();
+      final response = await http.Response.fromStream(streamedResponse);
 
-      if (res.statusCode == 200) {
-        final data = jsonDecode(res.body);
-        final url = data['photoUrl'] as String?;
-        if (url != null) {
-          if (currentUser != null) {
-            currentUser = currentUser!.copyWith(photoUrl: url);
-            notifyListeners();
-          } else {
-            // kullanıcı yoksa profili çek
-            await fetchUserProfile();
-          }
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body);
+        final photoUrl = data["photoUrl"];
+
+        if (kDebugMode) {
+          print("DEBUG -> Photo successfully uploaded: $photoUrl");
         }
+
+        await fetchUserProfile();
       } else {
         if (kDebugMode) {
-          print('Upload failed ${res.statusCode}: ${res.body}');
+          print("ERROR -> Photo upload failed. Status: ${response.statusCode}, Body: ${response.body}");
         }
       }
     } catch (e) {
-      if (kDebugMode) print('Upload error: $e');
+      if (kDebugMode) {
+        print("EXCEPTION -> uploadPhoto error: $e");
+      }
     }
   }
-
 
   // TAG - LOGOUT
   Future<void> logout() async {
@@ -203,7 +217,7 @@ class AuthViewModel extends ChangeNotifier {
     if (kDebugMode) {
       print("DEBUG -> Logged out, token removed.");
     }
-
     notifyListeners();
   }
+
 }

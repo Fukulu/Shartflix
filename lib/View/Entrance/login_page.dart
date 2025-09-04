@@ -12,8 +12,10 @@ import 'package:nodelabscase/Core/Theme/app_icons.dart';
 import 'package:nodelabscase/Core/Theme/app_typography.dart';
 import 'package:nodelabscase/View/Entrance/register_page.dart';
 import 'package:nodelabscase/View/Home/home_page.dart';
+import 'package:nodelabscase/View/Home/tab_controller_page.dart';
 import 'package:provider/provider.dart';
 
+import '../../Components/CustomViews/custom_snackbar_view.dart';
 import '../../ViewModel/auth_view_model.dart';
 
 class LoginPage extends StatefulWidget {
@@ -43,9 +45,7 @@ class _LoginPageState extends State<LoginPage> {
       final password = _passwordController.text;
 
       if (email.isEmpty || password.isEmpty) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text("Lütfen e-posta ve şifre giriniz.")),
-        );
+        CustomSnackBar.show(context, "Please fill in all fields.");
         return;
       }
 
@@ -63,14 +63,10 @@ class _LoginPageState extends State<LoginPage> {
       if (authViewModel.currentUser != null) {
         Navigator.pushReplacement(
           context,
-          MaterialPageRoute(builder: (context) => const HomePage()), // TODO: HomePage koy
+          MaterialPageRoute(builder: (context) => const TabControllerPage()),
         );
       } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text("Girdiğiniz bilgileri kontrol edin!"),
-          ),
-        );
+        CustomSnackBar.show(context, "Please check your credentials and try again.");
       }
   }
 
@@ -95,9 +91,9 @@ class _LoginPageState extends State<LoginPage> {
                     const SizedBox(height: 10,),
 
                     // TAG - 2 - EXPLANATION TEXTS
-                    const Text("Giriş Yap", style: AppTypography.h3),
+                    const Text("Log In", style: AppTypography.h3),
                     const SizedBox(height: 10,),
-                    const Text("Kullancı bilgilerinle giriş yap", style: AppTypography.bodyMediumRegular),
+                    const Text("Log In with your account", style: AppTypography.bodyMediumRegular),
 
                     const SizedBox(height: 30,),
 
@@ -120,7 +116,7 @@ class _LoginPageState extends State<LoginPage> {
                                   print("DEBUG -> Forgot Password Tapped!");
                                 }
                               },
-                              child: const Text("Şifre Unuttum", style: AppTypography.bodyMediumBold),
+                              child: const Text("Forgot Password", style: AppTypography.bodyMediumBold),
                             ),
                           ]
                       ),
@@ -130,9 +126,9 @@ class _LoginPageState extends State<LoginPage> {
 
                     // TAG - 5 - LOGIN BUTTON
                     PrimaryLargeButton(
-                        buttonText: "Giriş Yap",
-                        onPressed: (){
-                          _onLoginPressed();
+                        buttonText: "Log In",
+                        onPressed: () async {
+                          await _onLoginPressed();
                         },
                         isActive: true
                     ),
@@ -175,15 +171,15 @@ class _LoginPageState extends State<LoginPage> {
                     Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        const Text("Bir hesabın yok mu? ", style: AppTypography.bodyMediumRegular),
+                        const Text("Don't you have an account? ", style: AppTypography.bodyMediumRegular),
                         TextButton(
                           onPressed: (){
                             Navigator.pushReplacement(
                                 context,
-                                MaterialPageRoute(builder: (context) => RegisterPage())
+                                MaterialPageRoute(builder: (context) => const RegisterPage())
                             );
                           },
-                          child: const Text("Kayıt Ol", style: AppTypography.bodyMediumBold),
+                          child: const Text("Sign Up", style: AppTypography.bodyMediumBold),
                         )
                       ],
                     )

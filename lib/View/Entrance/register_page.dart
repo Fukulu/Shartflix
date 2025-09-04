@@ -81,17 +81,17 @@ class _RegisterPageState extends State<RegisterPage> {
     final email = _emailController.text.trim();
 
     if (name.isEmpty || email.isEmpty || password.isEmpty || repeatPassword.isEmpty) {
-      CustomSnackBar.show(context, "Lütfen tüm alanları doldurun!");
+      CustomSnackBar.show(context, "Please fill in all fields.");
       return;
     }
 
     if (password != repeatPassword) {
-      CustomSnackBar.show(context, "Parola tekrarını kontrol edin!");
+      CustomSnackBar.show(context, "Given passwords do not match.");
       return;
     }
 
     if (!accepted) {
-      CustomSnackBar.show(context, "Sözleşmeyi onaylayın!");
+      CustomSnackBar.show(context, "Please accept the terms and conditions.");
       return;
     }
 
@@ -122,19 +122,13 @@ class _RegisterPageState extends State<RegisterPage> {
         setState(() {
           isLoading = false;
         });
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text("Kayıt başarısız! Lütfen bilgilerinizi kontrol edin."),
-          ),
-        );
+        CustomSnackBar.show(context, "Registration failed. Please try again...");
       }
     } catch (e) {
       setState(() {
         isLoading = false;
       });
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("Hata oluştu: $e")),
-      );
+      CustomSnackBar.show(context, "Something Wrong: $e");
     }
 
   }
@@ -159,9 +153,9 @@ class _RegisterPageState extends State<RegisterPage> {
                   const SizedBox(height: 10),
 
                   // TAG - 2 - EXPLANATION TEXTS
-                  const Text("Hesap Oluştur", style: AppTypography.h3),
+                  const Text("Create Account", style: AppTypography.h3),
                   const SizedBox(height: 10),
-                  const Text("Kullanıcı bilgilerini girerek kaydol",
+                  const Text("Insert your details to create your account",
                       style: AppTypography.bodyMediumRegular),
 
                   const SizedBox(height: 30),
@@ -181,7 +175,7 @@ class _RegisterPageState extends State<RegisterPage> {
                   const SizedBox(height: 20),
                   CustomPasswordField(
                     controller: _repeatPasswordController,
-                    hintText: "Şifre Tekrar",
+                    hintText: "Repeat Password",
                   ),
 
                   const SizedBox(height: 30),
@@ -207,9 +201,9 @@ class _RegisterPageState extends State<RegisterPage> {
                             text: const TextSpan(
                               style: AppTypography.bodyMediumRegular,
                               children: [
-                                TextSpan(text: "Kullanıcı sözleşmesini "),
+                                TextSpan(text: "Terms of Use "),
                                 TextSpan(
-                                  text: "Okudum ve Kabul ediyorum",
+                                  text: "I read and accept",
                                   style: TextStyle(
                                     fontWeight: FontWeight.bold,
                                     decoration: TextDecoration.underline,
@@ -217,7 +211,7 @@ class _RegisterPageState extends State<RegisterPage> {
                                 ),
                                 TextSpan(
                                   text:
-                                  ". Bu sözleşmeyi okuyarak devam ediniz lütfen.",
+                                  ". Please continue after reading the agreement.",
                                 ),
                               ],
                             ),
@@ -231,8 +225,10 @@ class _RegisterPageState extends State<RegisterPage> {
 
                   // TAG - 5 - REGISTER BUTTON
                   PrimaryLargeButton(
-                    buttonText: "Kayıt Ol",
-                    onPressed: _onRegisterPressed,
+                    buttonText: "Register",
+                    onPressed: () async {
+                      await _onRegisterPressed();
+                    },
                     isActive: isButtonActive,
                   ),
 
@@ -271,7 +267,7 @@ class _RegisterPageState extends State<RegisterPage> {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      const Text("Hesabın var mı? ",
+                      const Text("I have an account. ",
                           style: AppTypography.bodyMediumRegular),
                       TextButton(
                         onPressed: () {
@@ -280,7 +276,7 @@ class _RegisterPageState extends State<RegisterPage> {
                             MaterialPageRoute(builder: (context) => const LoginPage()),
                           );
                         },
-                        child: const Text("Giriş Yap",
+                        child: const Text("Log In",
                             style: AppTypography.bodyMediumBold),
                       ),
                     ],
