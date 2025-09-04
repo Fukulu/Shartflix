@@ -3,7 +3,7 @@ import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
 import '../Model/favorite_movie_model.dart';
 import '../Model/movie_model.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import '../Core/Storage/secure_storage.dart';
 
 class MovieViewModel extends ChangeNotifier {
   static const String _baseUrl = "https://caseapi.servicelabs.tech";
@@ -20,11 +20,25 @@ class MovieViewModel extends ChangeNotifier {
   List<FavoriteMovieModel> favoriteMovies = [];
   bool isFavoriteLoading = false;
 
+  void reset() {
+    movies = [];
+    totalPages = 0;
+    currentPage = 1;
+    lastFetchedPage = 0;
+    isLoading = false;
+    favoriteMovieIds = [];
+    favoriteMovies = [];
+    isFavoriteLoading = false;
+    notifyListeners();
+  }
+
+  Future<void> _loadToken() async {
+    token = await SecureStorage.read("auth_token");
+  }
 
   // TAG - FETCH MOVIES WITH PAGINATION
   Future<void> fetchMovies({int page = 1}) async {
-    final prefs = await SharedPreferences.getInstance();
-    token = prefs.getString("auth_token");
+    await _loadToken();
     if (token == null) return;
 
     if (isLoading || page <= lastFetchedPage) return;
@@ -57,15 +71,11 @@ class MovieViewModel extends ChangeNotifier {
           print("DEBUG -> ${movies.length} films loaded. Page: $page/$totalPages");
         }
       } else {
-        if (kDebugMode) {
-          print("ERROR -> fetchMovies failed: ${response.statusCode}");
-          print("DEBUG -> Body: ${response.body}");
-        }
+        debugPrint("ERROR -> fetchMovies failed: ${response.statusCode}");
+        debugPrint("DEBUG -> Body: ${response.body}");
       }
     } catch (e) {
-      if (kDebugMode) {
-        print("EXCEPTION -> fetchMovies error: $e");
-      }
+      debugPrint("EXCEPTION -> fetchMovies error: $e");
     } finally {
       isLoading = false;
       notifyListeners();
@@ -74,8 +84,7 @@ class MovieViewModel extends ChangeNotifier {
 
   // TAG - FETCH FAVORITES
   Future<void> fetchFavorites() async {
-    final prefs = await SharedPreferences.getInstance();
-    token = prefs.getString("auth_token");
+    await _loadToken();
     if (token == null) return;
 
     try {
@@ -86,7 +95,6 @@ class MovieViewModel extends ChangeNotifier {
 
       if (response.statusCode == 200) {
         final decoded = jsonDecode(response.body);
-
         final movieList = (decoded["data"] as List?) ?? [];
 
         favoriteMovies = movieList
@@ -116,8 +124,7 @@ class MovieViewModel extends ChangeNotifier {
     isFavoriteLoading = true;
     notifyListeners();
 
-    final prefs = await SharedPreferences.getInstance();
-    token = prefs.getString("auth_token");
+    await _loadToken();
     if (token == null) {
       isFavoriteLoading = false;
       notifyListeners();
@@ -136,6 +143,9 @@ class MovieViewModel extends ChangeNotifier {
 
       if (response.statusCode == 200) {
         await fetchFavorites();
+      } else {
+        debugPrint("ERROR -> toggleFavorite failed: ${response.statusCode}");
+        debugPrint("DEBUG -> Body: ${response.body}");
       }
     } catch (e) {
       debugPrint("EXCEPTION -> toggleFavorite error: $e");
@@ -144,6 +154,4 @@ class MovieViewModel extends ChangeNotifier {
       notifyListeners();
     }
   }
-
-
 }

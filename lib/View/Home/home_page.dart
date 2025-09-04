@@ -42,109 +42,118 @@ class _HomePageState extends State<HomePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.black,
-      body: Consumer<MovieViewModel>(
-        builder: (context, movieVM, child) {
-          if (movieVM.isLoading && movieVM.movies.isEmpty) {
-            return const CircularIndicatorView();
-          }
+      body: RefreshIndicator(
+        color: AppColors.primary,
+        backgroundColor: AppColors.black,
+        onRefresh: () async {
+          final movieVM = Provider.of<MovieViewModel>(context, listen: false);
+          await movieVM.fetchMovies(page: 1);
+          await movieVM.fetchFavorites();
+        },
+        child: Consumer<MovieViewModel>(
+          builder: (context, movieVM, child) {
+            if (movieVM.isLoading && movieVM.movies.isEmpty) {
+              return const CircularIndicatorView();
+            }
 
-          if (movieVM.movies.isEmpty) {
-            return const Center(child: Text("No movies available"));
-          }
+            if (movieVM.movies.isEmpty) {
+              return const Center(child: Text("No movies available"));
+            }
 
-          return Stack(
-            children: [
-              PageView.builder(
-                controller: _pageController,
-                scrollDirection: Axis.vertical,
-                itemCount: movieVM.movies.length,
-                itemBuilder: (context, index) {
-                  final movie = movieVM.movies[index];
-                  final posterUrl = movie.posterUrl.startsWith("http://")
-                      ? movie.posterUrl.replaceFirst("http://", "https://")
-                      : movie.posterUrl;
+            return Stack(
+              children: [
+                PageView.builder(
+                  controller: _pageController,
+                  scrollDirection: Axis.vertical,
+                  itemCount: movieVM.movies.length,
+                  itemBuilder: (context, index) {
+                    final movie = movieVM.movies[index];
+                    final posterUrl = movie.posterUrl.startsWith("http://")
+                        ? movie.posterUrl.replaceFirst("http://", "https://")
+                        : movie.posterUrl;
 
-                  if ((index + 1) == movieVM.movies.length &&
-                      movieVM.movies.length % 5 == 0 &&
-                      !movieVM.isLoading) {
-                    final nextPage = movieVM.currentPage + 1;
-                    debugPrint("DEBUG -> Fetching Page $nextPage...");
-                    movieVM.fetchMovies(page: nextPage);
-                  }
+                    if ((index + 1) == movieVM.movies.length &&
+                        movieVM.movies.length % 5 == 0 &&
+                        !movieVM.isLoading) {
+                      final nextPage = movieVM.currentPage + 1;
+                      debugPrint("DEBUG -> Fetching Page $nextPage...");
+                      movieVM.fetchMovies(page: nextPage);
+                    }
 
-                  return Stack(
-                    children: [
-                      // TAG - BACKGROUND IMAGE
-                      BlurredBackground(image: posterUrl),
+                    return Stack(
+                      children: [
+                        // TAG - BACKGROUND IMAGE
+                        BlurredBackground(image: posterUrl),
 
-                      Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 15.0),
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.end,
-                          children: [
-                            // TAG - LIKE BUTTON
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.end,
-                              children: [
-                                LikeButton(
-                                  isSelected: movieVM.favoriteMovieIds.contains(movie.id),
-                                  onPressed: () {
-                                    movieVM.toggleFavorite(movie.id);
-                                  },
-                                ),
-                              ],
-                            ),
-                            const SizedBox(height: 10),
-
-                            // TAG - MOVIE TITLE & DESCRIPTION
-                            Row(
-                              crossAxisAlignment: CrossAxisAlignment.center,
-                              children: [
-                                SvgPicture.asset("assets/images/circleN.svg"),
-                                const SizedBox(width: 10),
-                                Expanded(
-                                  child: Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
-                                    children: [
-                                      Text(
-                                        movie.title,
-                                        style: AppTypography.h3.copyWith(color: Colors.white),
-                                      ),
-                                      const SizedBox(height: 8),
-                                      ExpandableText(
-                                        text: movie.description,
-                                        trimLines: 2,
-                                      ),
-                                    ],
+                        Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 15.0),
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.end,
+                            children: [
+                              // TAG - LIKE BUTTON
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.end,
+                                children: [
+                                  LikeButton(
+                                    isSelected: movieVM.favoriteMovieIds.contains(movie.id),
+                                    onPressed: () {
+                                      movieVM.toggleFavorite(movie.id);
+                                    },
                                   ),
-                                ),
-                              ],
-                            ),
-                            const SizedBox(height: 100),
-                          ],
-                        ),
-                      ),
-                    ],
-                  );
-                },
-              ),
+                                ],
+                              ),
+                              const SizedBox(height: 10),
 
-              if (movieVM.isLoading)
-                const Positioned(
-                  bottom: 100,
-                  left: 0,
-                  right: 0,
-                  child: Center(
-                    child: CircularProgressIndicator(color: AppColors.primary),
-                  ),
+                              // TAG - MOVIE TITLE & DESCRIPTION
+                              Row(
+                                crossAxisAlignment: CrossAxisAlignment.center,
+                                children: [
+                                  SvgPicture.asset("assets/images/circleN.svg"),
+                                  const SizedBox(width: 10),
+                                  Expanded(
+                                    child: Column(
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      children: [
+                                        Text(
+                                          movie.title,
+                                          style: AppTypography.h3.copyWith(color: Colors.white),
+                                        ),
+                                        const SizedBox(height: 8),
+                                        ExpandableText(
+                                          text: movie.description,
+                                          trimLines: 2,
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              const SizedBox(height: 100),
+                            ],
+                          ),
+                        ),
+                      ],
+                    );
+                  },
                 ),
 
-              if (movieVM.isFavoriteLoading)
-                const CircularIndicatorView()
+                if (movieVM.isLoading)
+                  const Positioned(
+                    bottom: 100,
+                    left: 0,
+                    right: 0,
+                    child: Center(
+                      child: CircularProgressIndicator(color: AppColors.primary),
+                    ),
+                  ),
 
-            ],
-          );
-        },
+                if (movieVM.isFavoriteLoading)
+                  const CircularIndicatorView()
+
+              ],
+            );
+          },
+        ),
       ),
     );
   }

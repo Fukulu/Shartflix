@@ -1,10 +1,8 @@
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:nodelabscase/Components/CustomButtons/limited_offer_button.dart';
 import 'package:nodelabscase/Components/CustomViews/custom_background_view.dart';
 import 'package:nodelabscase/Components/CustomViews/liked_cards_view.dart';
 import 'package:nodelabscase/Components/CustomViews/profile_header.dart';
-import 'package:nodelabscase/Core/Theme/app_icons.dart';
 import 'package:nodelabscase/Core/Theme/app_typography.dart';
 import 'package:nodelabscase/View/Profile/upload_photo_page.dart';
 import 'package:provider/provider.dart';
@@ -12,6 +10,7 @@ import '../../Core/Theme/app_colors.dart';
 import '../../ViewModel/auth_view_model.dart';
 import '../../ViewModel/movie_view_model.dart';
 import '../Entrance/login_page.dart';
+import '../Offer/limited_offer_page.dart';
 
 class ProfilePage extends StatefulWidget {
   const ProfilePage({super.key});
@@ -49,6 +48,7 @@ class _ProfilePageState extends State<ProfilePage> {
                               onPressed: () async {
                                 await authVM.logout();
                                 if (mounted) {
+                                  movieVM.reset();
                                   Navigator.pushAndRemoveUntil(
                                     context,
                                     MaterialPageRoute(builder: (context) => const LoginPage()),
@@ -62,7 +62,16 @@ class _ProfilePageState extends State<ProfilePage> {
                           )
                         ],
                       ),
-                      LimitedOfferButton(onPressed: () {})
+                      LimitedOfferButton(
+                          onPressed: () {
+                            showModalBottomSheet(
+                              context: context,
+                              isScrollControlled: true,
+                              backgroundColor: Colors.transparent,
+                              builder: (context) => const LimitedOfferPage(),
+                            );
+                        }
+                      )
                     ],
                   ),
                   const SizedBox(height: 20),
@@ -92,30 +101,37 @@ class _ProfilePageState extends State<ProfilePage> {
         
                   // TAG - FAVORITE MOVIES LIST
                   Expanded(
-                    child: movieVM.favoriteMovies.isEmpty
-                        ? const Center(
-                        child: Text("No favorite movies yet.",
-                            style: AppTypography.bodyMediumRegular))
-                        : GridView.builder(
-                      gridDelegate:
-                      const SliverGridDelegateWithFixedCrossAxisCount(
-                        crossAxisCount: 2,
-                        childAspectRatio: 0.7,
-                        crossAxisSpacing: 12,
-                        mainAxisSpacing: 12,
-                      ),
-                      itemCount: movieVM.favoriteMovies.length,
-                      itemBuilder: (context, index) {
-                        final movie = movieVM.favoriteMovies[index];
-                        return LikedCardView(
-                          imageUrl: movie.posterUrl,
-                          title: movie.title,
-                          subtitle: movie.director,
-                        );
+                    child: RefreshIndicator(
+                      color: AppColors.primary,
+                      backgroundColor: AppColors.black,
+                      onRefresh: () async {
+                        final movieVM = Provider.of<MovieViewModel>(context, listen: false);
+                        await movieVM.fetchFavorites();
                       },
-                    ),
+                      child: movieVM.favoriteMovies.isEmpty
+                          ? const Center(
+                            child: Text("No favorite movies yet.",
+                                style: AppTypography.bodyMediumRegular))
+                          : GridView.builder(
+                        gridDelegate:
+                        const SliverGridDelegateWithFixedCrossAxisCount(
+                          crossAxisCount: 2,
+                          childAspectRatio: 0.7,
+                          crossAxisSpacing: 12,
+                          mainAxisSpacing: 12,
+                        ),
+                        itemCount: movieVM.favoriteMovies.length,
+                        itemBuilder: (context, index) {
+                          final movie = movieVM.favoriteMovies[index];
+                          return LikedCardView(
+                            imageUrl: movie.posterUrl,
+                            title: movie.title,
+                            subtitle: movie.director,
+                          );
+                        },
+                      ),
+                    )
                   ),
-
                   const SizedBox(height: 100),
                 ],
               ),
