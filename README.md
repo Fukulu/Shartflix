@@ -16,4 +16,4 @@
 - AnimationController
 
 ## Application Video
-
+![App Demo](assets/Shartflix.mp4)
