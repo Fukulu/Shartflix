@@ -1,16 +1,19 @@
 # nodelabscase
 
-A new Flutter project for nodelabs case
+- A new Flutter/Dart project for nodelabs case
 
 ## Getting Started
 
-This project is a starting point for a Flutter application.
+- MVVM Pattern
+- Provider, Change Notifier
+- App Theme
+- Clean Coding
+- Secure Storage
+- Splash Screen
+- JSON Decoding
+- REST API
+- HTTP.MultipartRequest
+- AnimationController
 
-A few resources to get you started if this is your first Flutter project:
+## Application Video
 
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
-
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
